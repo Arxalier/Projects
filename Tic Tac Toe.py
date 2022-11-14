@@ -1,4 +1,4 @@
-tiles,player,start,play=[' ' for i in range(9)],False,["O","X"],True # TIC TAC TOE IN 6 LINES IN PYTHON, player = False for x to play and player = True for y to play
+tiles,player,start,play=[' ' for i in range(9)],False,["O","X"],True # TIC TAC TOE IN 6 LINES IN PYTHON, player = False for X to play and player = True for O to play
 while play:
     print("Tic Tac Toe\n1, 2, 3\n4, 5, 6\n7, 8, 9\nRefer to the numbers to play a move\n"+"|".join(tiles[0:3])+"\n"+"—"*6+"\n"+"|".join(tiles[3:6])+"\n"+"—"*6+"\n"+"|".join(tiles[6:])+"\n"+"You are O") if player else print("Tic Tac Toe\n1, 2, 3\n4, 5, 6\n7, 8, 9\nRefer to the numbers to play a move\n"+"|".join(tiles[0:3])+"\n"+"—"*6+"\n"+"|".join(tiles[3:6])+"\n"+"—"*6+"\n"+"|".join(tiles[6:])+"\n"+"You are X")
     tile,player,tiles[int(tile)-1]=input("Enter tile to place in: "),not player,start[int(not player)]
