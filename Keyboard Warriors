@@ -1,0 +1,20 @@
+import time, random
+t,g = """\n+--^----------,--------,-----,--------^-,\n| |||||||||   `--------'     |          O\n`+---------------------------^----------|\n  `\\_,---------,---------,--------------'\n    / XXXXXX /'|       /'\n   / XXXXXX /  `\\    /'\n  / XXXXXX /`-------'\n / XXXXXX /\n/ XXXXXX /\n(________(                \n`------'              \n _  __          _                         _  __          __                             \n| |/ /         | |                       | | \\ \\        / /            (_)               \n| ' / ___ _   _| |__   ___   __ _ _ __ __| |  \\ \\  /\\  / /_ _ _ __ _ __ _  ___  _ __ ___ \n|  < / _ \\ | | | '_ \\ / _ \\ / _` | '__/ _` |   \\ \\/  \\/ / _` | '__| '__| |/ _ \\| '__/ __|\n| . \\  __/ |_| | |_) | (_) | (_| | | | (_| |    \\  /\\  / (_| | |  | |  | | (_) | |  \\__ \\\n|_|\\_\\___|\\__, |_.__/ \\___/ \\__,_|_|  \\__,_|     \\/  \\/ \\__,_|_|  |_|  |_|\\___/|_|  |___/\n           __/ |                                                                         \n          |___/                                                                          \n                      A GAME BY ARXALIER\n""",  """\n_____________________\n|Q W E R T Y U I O P|\n| A S D F G H J K L |\n|   Z X C V B N M   |  \n| _______𝓕𝓲𝓻𝓮______ |\n"""
+print(t, "\nEnter anything to start...")
+input()
+health, score, targets, startTime, points = 100, 0, 10, time.time(), 0
+for i in range(targets):
+    if health<=0:
+        print("Comrade, you did well. Your death will be avenged\n", """\n____\n                              __,---'     `--.__\n                           ,-'                ; `.\n                          ,'                  `--.`--.\n                         ,'                       `._ `-.\n                         ;                     ;     `-- ;\n                       ,-'-_       _,-~~-.      ,--      `.\n                       ;;   `-,;    ,'~`.__    ,;;;    ;  ;\n                       ;;    ;,'  ,;;      `,  ;;;     `. ;\n                       `:   ,'    `:;     __/  `.;      ; ;\n                        ;~~^.   `.   `---'~~    ;;      ; ;\n                        `,' `.   `.            .;;;     ;'\n                        ,',^. `.  `._    __    `:;     ,'\n                        `-' `--'    ~`--'~~`--.  ~    ,'\n                       /;`-;_ ; ;. /. /   ; ~~`-.     ;\n-._                   ; ;  ; `,;`-;__;---;      `----'\n   `--.__             ``-`-;__;:  ;  ;__;\n ...     `--.__                `-- `-'\n`--.:::...     `--.__                ____\n    `--:::::--.      `--.__    __,--'    `.\n        `--:::`;....       `--'       ___  `.\n            `--`-:::...     __           )  ;\n                  ~`-:::...   `---.      ( ,'\n                      ~`-:::::::::`--.   `-.\n                          ~`-::::::::`.    ;\n                              ~`--:::,'   ,'\n                                   ~~`--'~\n""","You have died honourably in service with a score of "+str(points))
+        quit()
+    key = "QWERTYUIOPASDFGHJKLZXCVBNM"[random.randint(0,25)]
+    print(g.replace(key, "🕴️"))
+    start, target = time.time(), input("Enter your target square: ").upper()
+    duration = round(time.time()-start, 2)
+    if key==target:
+        points += 10 + max(min((1/duration)*10, 30), 0)*10
+        print("Target neutralised, good work soldier."+"\nYou got "+str(int(10 + max(min((1/duration)*10, 30), 0)*10))+" points.")
+    else:
+        health-=random.randint(10,15)
+        print("You missed and got shot, you now have",health," health.")
+print("You have finished the mission in "+str(round(time.time() - startTime, 2))+" seconds with "+str(int(points))+" points and "+str(health)+" health.")
