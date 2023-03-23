@@ -1,0 +1,69 @@
+# Graphing calculator
+plane = []
+x_length=30
+x_length+=1
+y_axis = x_length//2
+y_length=20
+x_axis= y_length//2
+rowElem = [" "]*x_length
+max_y_length=5
+x_indices = [i for i in range(x_axis, -x_axis-1,-1)]
+y_indices = [i for i in range(-y_axis, y_axis+1,1)]
+for i in x_indices:
+	num=(str(i)+(max_y_length-len(str(i)))*" "+"█ ")
+	thisRowElem = [num]+rowElem[:]
+	plane.append(thisRowElem[:])
+# Generate abscissae
+x_coordinates = [str(i) for i in range(-y_axis, y_axis+1, +1)]
+max_x_length=len(x_coordinates[0])
+formatted_x_coordinates=[]
+for abscissa in x_coordinates:
+	x_elem=abscissa+" "*(max_x_length-len(abscissa))
+	formatted_x_coordinates.append(x_elem)
+#print(formatted_x_coordinates)
+
+# Create y axis
+for row in range(y_length+1):
+	plane[row][y_axis+1]="|"
+plane[x_axis][1:]=["–"]*x_length
+plane[x_axis][(x_length//2)+1]="+"
+def plot_graph():
+	for row in plane:
+		print("".join(row))
+	print(" "*(max_y_length)+"="*(x_length+2))
+	for i in range(len(x_coordinates[1])):
+		x_label = " "*(max_y_length+2)
+		for j in formatted_x_coordinates:
+			x_label+=j[i]
+		print(x_label)
+#plot_graph()
+print('Arx Graphing Calculator')
+print("Supports all equations in x and y (no support for trigonometric functions)")
+equation = input("Enter equation in standard form: ").replace(' ','')[:-2]
+equation=equation.replace("^","**")
+#plot_graph()
+function=[]
+print(equation)
+for y in range((y_length)//2, (-(y_length)//2)-1,-1):
+	for x in range(-((x_length)//2), (x_length//2)+1,1):
+		dataPoint = [x,y]
+		solution=equation.replace("x","("+str(x)+")").replace("y", "("+str(y)+")")
+		#print(solution)
+		dataPoint.append(eval(solution))
+		#print(dataPoint)
+		function.append(dataPoint)
+counter=0
+for row in range(len(plane)):
+	for elem in range(1, len(plane[0])):
+		#print(row, elem, counter, function[counter])
+		if function[counter][2]==0:
+			plane[row][elem]="X"
+		elif abs(function[counter][2])<=1:
+			plane[row][elem]="*"
+		elif abs(function[counter][2])<=2:
+			plane[row][elem]="."
+			#print(row, elem)
+			#print(function[counter])
+		counter+=1
+plot_graph()
+		
