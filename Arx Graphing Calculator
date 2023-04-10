@@ -1,33 +1,38 @@
-# Graphing calculator
+# Graphing calculator, (30,20)
+# INITIALISATION
 plane = []
-x_length=30
+x_length=50 # Keep even number
 x_length+=1
-y_axis = x_length//2
-y_length=20
-x_axis= y_length//2
+x_length=x_length
+y_axis_index = x_length//2
+y_length=30 # Keep even
+x_axis_index= y_length//2
 rowElem = [" "]*x_length
-max_y_length=5
-x_indices = [i for i in range(x_axis, -x_axis-1,-1)]
-y_indices = [i for i in range(-y_axis, y_axis+1,1)]
+max_y_length=2+len(str(y_length))
+x_indices = [i for i in range(x_axis_index, -x_axis_index-1,-1)]
+y_indices = [i for i in range(-y_axis_index, y_axis_index+1,1)]
+# We need y_length//2, -(y_length//2)-1, -1 for every y label which is same as x_indices
 for i in x_indices:
+	# Add individual row elements to the plane
 	num=(str(i)+(max_y_length-len(str(i)))*" "+"█ ")
 	thisRowElem = [num]+rowElem[:]
 	plane.append(thisRowElem[:])
-# Generate abscissae
-x_coordinates = [str(i) for i in range(-y_axis, y_axis+1, +1)]
+# Generate x-coordinates
+x_coordinates = [str(i) for i in y_indices]
 max_x_length=len(x_coordinates[0])
 formatted_x_coordinates=[]
 for abscissa in x_coordinates:
 	x_elem=abscissa+" "*(max_x_length-len(abscissa))
 	formatted_x_coordinates.append(x_elem)
-#print(formatted_x_coordinates)
-
+# formatted_x_coordinates stores sequentially each x-coordinate with each element having same string length
+# Now the plane exists as a list
 # Create y axis
 for row in range(y_length+1):
-	plane[row][y_axis+1]="|"
-plane[x_axis][1:]=["–"]*x_length
-plane[x_axis][(x_length//2)+1]="+"
-def plot_graph():
+	plane[row][y_axis_index+1]="|" # +1 because every row has a label element with with 0
+plane[x_axis_index][1:]=["–"]*x_length # Create x-axis
+plane[x_axis_index][(x_length//2)+1]="+" # Create origin
+
+def display_graph():
 	for row in plane:
 		print("".join(row))
 	print(" "*(max_y_length)+"="*(x_length+2))
@@ -36,34 +41,49 @@ def plot_graph():
 		for j in formatted_x_coordinates:
 			x_label+=j[i]
 		print(x_label)
-#plot_graph()
+# --------------------------------- Program Start
 print('Arx Graphing Calculator')
 print("Supports all equations in x and y (no support for trigonometric functions)")
-equation = input("Enter equation in standard form: ").replace(' ','')[:-2]
-equation=equation.replace("^","**")
-#plot_graph()
-function=[]
-print(equation)
-for y in range((y_length)//2, (-(y_length)//2)-1,-1):
-	for x in range(-((x_length)//2), (x_length//2)+1,1):
-		dataPoint = [x,y]
-		solution=equation.replace("x","("+str(x)+")").replace("y", "("+str(y)+")")
-		#print(solution)
-		dataPoint.append(eval(solution))
-		#print(dataPoint)
-		function.append(dataPoint)
-counter=0
-for row in range(len(plane)):
-	for elem in range(1, len(plane[0])):
-		#print(row, elem, counter, function[counter])
-		if function[counter][2]==0:
-			plane[row][elem]="X"
-		elif abs(function[counter][2])<=1:
-			plane[row][elem]="*"
-		elif abs(function[counter][2])<=2:
-			plane[row][elem]="."
-			#print(row, elem)
-			#print(function[counter])
-		counter+=1
-plot_graph()
-		
+while True:
+	equation = input("Enter equation in standard form: ").replace(' ','')[:-2]
+	equation=equation.replace("^","**").replace("e","(2.7182)").replace("π","3.1415")
+	#plot_graph()
+	function=[]
+	print(equation)
+	for y in range((y_length)//2, (-(y_length)//2)-1,-1):
+		for x in range(-((x_length)//2), (x_length//2)+1,1):
+			dataPoint = [x,y]
+			solution=equation.replace("x","("+str(x)+")").replace("y", "("+str(y)+")")
+			#print(solution)
+			dataPoint.append(eval(solution))
+			#print(dataPoint)
+			function.append(dataPoint)
+	counter=0
+	for row in range(len(plane)):
+		for elem in range(1, len(plane[0])):
+			#print(row, elem, counter, function[counter])
+			if function[counter][2]==0:
+				plane[row][elem]="X"
+			elif abs(function[counter][2])<=1:
+				if plane[row][elem] != "X": plane[row][elem]="*"
+			elif abs(function[counter][2])<=2:
+				if plane[row][elem] != "X": plane[row][elem]="."
+				#print(row, elem)
+				#print(function[counter])
+			counter+=1
+	#plot_graph()
+	display_graph()
+	integrateChoice=int(input('Enter 1 if you want to perform definite integration: '))
+	if integrateChoice==1:
+		fixedExpression=input("Please repeat the given expression in y=f(x) form: y=").replace("^","**").replace("e","(2.7182)").replace("π","3.1415")
+		integral=0
+		accuracy = 1000
+		precision=1/accuracy
+		startLimit=float(input("Enter starting limit: "))
+		endLimit=float(input("Enter ending limit: "))
+		currentValue=startLimit
+		while currentValue<=endLimit:
+			currentExpression=fixedExpression.replace("x","("+str(currentValue)+")")
+			integral+=(eval(currentExpression)*precision)
+			currentValue+=precision
+		print(integral)
