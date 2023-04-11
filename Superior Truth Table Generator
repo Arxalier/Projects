@@ -1,0 +1,63 @@
+import sys
+def gates(d,e,f):
+    if(d==2):
+        if(e==True and f==True):
+            return bool(True)
+        else:
+            return bool(False)
+    if(d==3):
+        if(e==False and f==False):
+            return bool(False)
+        else:
+            return bool(True)
+    if(d==4):
+        if(e==False and f==False):
+            return bool(True)
+        else:
+            return bool(False)
+    if(d==5):
+        if(e==True and f==True):
+            return bool(False)
+        else:
+            return bool(True)
+    if(d==6):
+        if(e==True and f==False or e==False and f==True):
+            return bool(True)
+        else:
+            return bool(False)
+d=1
+while(d==1):
+    print("""welcome to logic gate truth table displayer -----By pranjal 
+             what do you wish to do?
+             > AND gate select 2
+             > OR gate  select 3
+             >NOR gate  select 4
+             >NaND gate select 5
+             >XOR gate  select 6
+             >about the program select 7""")
+    choice=int(input("enter your choice (2-6)"))
+    if(choice==2):
+        for i in range(0,2):
+            for h in range(0,2):
+                print("for inputs",i,h,"output is",gates(2,i,h))
+    if (choice == 3):
+        for i in range(0, 2):
+            for h in range(0, 2):
+                print("for inputs", i, h, "output is", gates(3, i, h))
+    if (choice == 4):
+        for i in range(0, 2):
+            for h in range(0, 2):
+                print("for inputs", i, h, "output is", gates(4, i, h))
+    if (choice == 5):
+        for i in range(0, 2):
+            for h in range(0, 2):
+                print("for inputs", i, h, "output is", gates(5, i, h))
+    if (choice == 6):
+        for i in range(0, 2):
+            for h in range(0, 2):
+                print("for inputs", i, h, "output is", gates(6, i, h))
+    print("do you wish to continue? press 1 if you want to continue")
+    d = int(input("enter your choice"))
+
+else:
+    sys.exit()
