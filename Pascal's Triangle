@@ -1,0 +1,17 @@
+try: rows = int(input("Enter required number of rows: "))
+except ValueError:
+	print("Please enter an integer.")
+	quit()
+if rows<1: 
+	print('Invalid input. Input must be greater an integer greater than 0')
+	quit()
+triangle = [[1]]
+for i in range(2, rows+1): # we start from 2 because row 1 is defined, and we end at required nth row
+	row=[]
+	previousRow=[0]+triangle[i-2]+[0] # Row 2 corresponds to index 0, so we do i-2, also we add [0] to the start and end as it is part of pascals triangle
+	for j in range(0,len(previousRow)-2+1): # previousrow has 2 extra added elements, first we remove those 2 in the range and add 1 to include last term. Now, consecutive terms of prior row are added pairwise till the last [0] is reached
+		elem=previousRow[j]+previousRow[j+1]
+		row.append(elem)
+	triangle.append(row)
+for i in triangle:
+	print(' '.join([str(j) for j in i]))
