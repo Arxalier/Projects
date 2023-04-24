@@ -1,0 +1,163 @@
+#sudoku = "3X54X2X6X49X76X1X86XX1X3245XX39XX58X96XX587X3X813X4X92X5X6X14XX2XX549X7X149XX73X6"
+eliminated=0
+sudoku="2XX5X74X6XXXX31XXXXXXXXX23XXXXX2XXXX86X31XXXXX45XXXXXXXX9XXX7XXXX695XXX2XX1XX6XX8"
+#sudoku="XXXX7XXXXX9X5X6X8XXX84X12XXX59XXX84X7XXXXXXX6X23XXX57XXX53X74XXX1X6X8X9XXXXX1XXXX"
+success=0
+dimensions="9x9"
+size = int(dimensions.split('x')[0])
+sudokuArray=[]
+while len(sudoku)!=0:
+	sudokuRow=sudoku[0:size]
+	sudoku=sudoku[size:]
+	splitSudokuRow=[i for i in sudokuRow]
+	sudokuArray.append(splitSudokuRow)
+for row in sudokuArray:
+	print(''.join(row))
+cells = []
+knownIndices = []
+for row in enumerate(sudokuArray):
+	cellRow = []
+	for element in enumerate(row[1]):
+		if element[1].isnumeric(): 
+			cellRow.append(element[1])
+			knownIndex = (row[0], element[0], element[1])
+			knownIndices.append(knownIndex)
+		else: cellRow.append(list(range(1,10)))
+	cells.append(cellRow)
+print(knownIndices)
+print(cells)
+def getChunk(row, column, size=3):
+	# size is 3 by default
+	initialRowIndex=row-(row%size)
+	initialColumnIndex=column-(column%size)
+	rowIndices = [i for i in range(initialRowIndex, initialRowIndex+size)]
+	columnIndices = [i for i in range(initialColumnIndex, initialColumnIndex+size)]
+	coordinates=[]
+	for i in rowIndices:
+		for j in columnIndices:
+			coordinates.append((i,j))
+	return coordinates
+print(getChunk(0,0))
+for index in knownIndices:
+	print(index)
+	row, col, digit = index
+	print(row, col, 'Removing possibilities from row')
+	for elem in enumerate(cells[row]):
+		if len(cells[row][elem[0]])!=1:
+			print('Found', cells[row][elem[0]])
+			print(digit)
+			if int(digit) in cells[row][elem[0]]: 
+				cells[row][elem[0]].remove(int(digit))
+				print(digit,'is removed from', cells[row][elem[0]])
+				eliminated+=1
+	print('Removing possibilities from column')
+	for elem in enumerate(cells):
+		if len(cells[elem[0]][col])!=1:
+			print('Found', cells[elem[0]][col])
+			print(digit)
+			if int(digit) in cells[elem[0]][col]:
+				cells[elem[0]][col].remove(int(digit))
+				print(digit,'is removed from', cells[elem[0]][col])
+				eliminated+=1
+	print('Removing possibilities from chunk')
+	print(index)
+	print(row, col)
+	print(getChunk(row, col))
+	for coordinate in getChunk(row, col):
+		print(coordinate)
+		chunkRow, chunkColumn = coordinate[0], coordinate[1]
+		print('Done')
+		if len(cells[chunkRow][chunkColumn])!=1:
+			print('Found cell in chunk', cells[chunkRow][chunkColumn])
+			if int(digit) in cells[chunkRow][chunkColumn]:
+				cells[chunkRow][chunkColumn].remove(int(digit))
+				print(digit, "is removed from chunk")
+				eliminated+=1
+	print('Printing out values')
+	print('cells:', cells)
+	for i in enumerate(cells):
+		for j in enumerate(i[1]):
+			currentElement=cells[i[0]][j[0]]
+			print(currentElement)
+			if type(currentElement)==type(list()):
+				if len(currentElement)==1:
+					knownIndices.append((i[0],j[0],currentElement[0]))
+					cells[i[0]][j[0]]=str(currentElement[0])
+					print('SUCCESS')
+					success+=1
+	# Now we check each row, column and chunk to ser if there ks any unique elemeny
+	'''print('Column check')
+	print(cells)
+	columns=[]
+	thisColumn=[]
+	for columnIndex in range(0, 9):
+		for rowCheck in enumerate(cells):
+			thisColumn.append(rowCheck[1][columnIndex])
+		columns.append(thisColumn)
+	print(columns)
+	for columnCheck in enumerate(columns):
+		occurrences={}
+		confirmedNumber=None
+		for elem in columnCheck[1]:
+			if len(elem)!=1:
+				for possibility in elem:
+				#	print('POSSIBILITIES', possibility)
+					if possibility in occurrences:
+						occurrences[possibility]+=1
+					else:
+						occurrences[possibility]=1
+		#	print('OCCURRENCES', occurrences)
+		for k, v in occurrences.items():
+			if v==1:
+				confirmedNumber=k
+				break
+			if confirmedNumber != None:
+				break
+		if confirmedNumber!=None:
+			print('CONFIRMED NUMBER', confirmedNumber)
+			for t in range(len(columnCheck[1])):
+				if len(columnCheck[1][t])!=1:
+					if confirmedNumber in columnCheck[1][t]:
+						knownIndices.append((t, columnCheck[0], confirmedNumber))
+						print(t, columnCheck[0], "error source")
+						cells[t][columnCheck[0]]=str(confirmedNumber)
+						print('CONFIRMED NUMBER FOUND!!!')
+						success+=1
+						break'''
+	print('Row check')
+	print(cells)
+	for rowCheck in enumerate(cells):
+		occurrences={}
+		confirmedNumber=None
+		for elem in rowCheck[1]:
+			if len(elem)!=1:
+				for possibility in elem:
+				#	print('POSSIBILITIES', possibility)
+					if possibility in occurrences:
+						occurrences[possibility]+=1
+					else:
+						occurrences[possibility]=1
+		#	print('OCCURRENCES', occurrences)
+		for k, v in occurrences.items():
+			if v==1:
+				confirmedNumber=k
+				break
+			if confirmedNumber != None:
+				break
+		if confirmedNumber!=None:
+			print('CONFIRMED NUMBER', confirmedNumber)
+			for t in range(len(rowCheck[1])):
+				if len(rowCheck[1][t])!=1:
+					if confirmedNumber in rowCheck[1][t]:
+						knownIndices.append((rowCheck[0], t, confirmedNumber))
+						cells[rowCheck[0]][t]=str(confirmedNumber)
+						print('CONFIRMED NUMBER FOUND!!!')
+						success+=1
+						break
+for elem in sudokuArray:
+	print(' '.join(elem))
+for elem in cells:
+	print((elem))
+#print(getChunk(0,0))
+print('Row duplicates removed')
+print(eliminated, 'values eliminated.', success,"values found out.")
