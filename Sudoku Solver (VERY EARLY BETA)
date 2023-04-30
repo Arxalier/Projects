@@ -1,7 +1,9 @@
-#sudoku = "3X54X2X6X49X76X1X86XX1X3245XX39XX58X96XX587X3X813X4X92X5X6X14XX2XX549X7X149XX73X6"
+sudoku = "3X54X2X6X49X76X1X86XX1X3245XX39XX58X96XX587X3X813X4X92X5X6X14XX2XX549X7X149XX73X6"
 eliminated=0
-sudoku="2XX5X74X6XXXX31XXXXXXXXX23XXXXX2XXXX86X31XXXXX45XXXXXXXX9XXX7XXXX695XXX2XX1XX6XX8"
+#sudoku="2XX5X74X6XXXX31XXXXXXXXX23XXXXX2XXXX86X31XXXXX45XXXXXXXX9XXX7XXXX695XXX2XX1XX6XX8"
 #sudoku="XXXX7XXXXX9X5X6X8XXX84X12XXX59XXX84X7XXXXXXX6X23XXX57XXX53X74XXX1X6X8X9XXXXX1XXXX"
+#sudoku="XXX8X1XXXXXXXXXX435XXXXXXXXXXXX7X8XXXXXXXX1XXX2XX3XXXX6XXXXXX75XX34XXXXXXXX2XX6XX"
+sudoku="91XX4XXXXXX4X738XXX6XXXXXX24XX8XXX6XX7XXXXX2XX3XXX9XX72XXXXXX1XXX638X5XXXXXX1XX39"
 success=0
 dimensions="9x9"
 size = int(dimensions.split('x')[0])
@@ -38,14 +40,17 @@ def getChunk(row, column, size=3):
 			coordinates.append((i,j))
 	return coordinates
 print(getChunk(0,0))
+currentIndice=-1
 for index in knownIndices:
+	currentIndice+=1
+	currentIndex=knownIndices.count(index)
 	print(index)
 	row, col, digit = index
 	print(row, col, 'Removing possibilities from row')
 	for elem in enumerate(cells[row]):
 		if len(cells[row][elem[0]])!=1:
-			print('Found', cells[row][elem[0]])
-			print(digit)
+			#print('Found', cells[row][elem[0]])
+			#print(digit)
 			if int(digit) in cells[row][elem[0]]: 
 				cells[row][elem[0]].remove(int(digit))
 				print(digit,'is removed from', cells[row][elem[0]])
@@ -53,20 +58,20 @@ for index in knownIndices:
 	print('Removing possibilities from column')
 	for elem in enumerate(cells):
 		if len(cells[elem[0]][col])!=1:
-			print('Found', cells[elem[0]][col])
-			print(digit)
+			#print('Found', cells[elem[0]][col])
+			#print(digit)
 			if int(digit) in cells[elem[0]][col]:
 				cells[elem[0]][col].remove(int(digit))
 				print(digit,'is removed from', cells[elem[0]][col])
 				eliminated+=1
 	print('Removing possibilities from chunk')
-	print(index)
-	print(row, col)
+	#print(index)
+	#print(row, col)
 	print(getChunk(row, col))
 	for coordinate in getChunk(row, col):
-		print(coordinate)
+		#print(coordinate)
 		chunkRow, chunkColumn = coordinate[0], coordinate[1]
-		print('Done')
+		#print('Done')
 		if len(cells[chunkRow][chunkColumn])!=1:
 			print('Found cell in chunk', cells[chunkRow][chunkColumn])
 			if int(digit) in cells[chunkRow][chunkColumn]:
@@ -78,54 +83,18 @@ for index in knownIndices:
 	for i in enumerate(cells):
 		for j in enumerate(i[1]):
 			currentElement=cells[i[0]][j[0]]
-			print(currentElement)
+			#print(currentElement)
 			if type(currentElement)==type(list()):
 				if len(currentElement)==1:
 					knownIndices.append((i[0],j[0],currentElement[0]))
 					cells[i[0]][j[0]]=str(currentElement[0])
 					print('SUCCESS')
 					success+=1
-	# Now we check each row, column and chunk to ser if there ks any unique elemeny
-	'''print('Column check')
-	print(cells)
-	columns=[]
-	thisColumn=[]
-	for columnIndex in range(0, 9):
-		for rowCheck in enumerate(cells):
-			thisColumn.append(rowCheck[1][columnIndex])
-		columns.append(thisColumn)
-	print(columns)
-	for columnCheck in enumerate(columns):
-		occurrences={}
-		confirmedNumber=None
-		for elem in columnCheck[1]:
-			if len(elem)!=1:
-				for possibility in elem:
-				#	print('POSSIBILITIES', possibility)
-					if possibility in occurrences:
-						occurrences[possibility]+=1
-					else:
-						occurrences[possibility]=1
-		#	print('OCCURRENCES', occurrences)
-		for k, v in occurrences.items():
-			if v==1:
-				confirmedNumber=k
-				break
-			if confirmedNumber != None:
-				break
-		if confirmedNumber!=None:
-			print('CONFIRMED NUMBER', confirmedNumber)
-			for t in range(len(columnCheck[1])):
-				if len(columnCheck[1][t])!=1:
-					if confirmedNumber in columnCheck[1][t]:
-						knownIndices.append((t, columnCheck[0], confirmedNumber))
-						print(t, columnCheck[0], "error source")
-						cells[t][columnCheck[0]]=str(confirmedNumber)
-						print('CONFIRMED NUMBER FOUND!!!')
-						success+=1
-						break'''
-	print('Row check')
-	print(cells)
+	# Now we check each row, column and chunk to see if there is any unique element
+	# DISASTER HAS BROKEN, THIS PART SEEMS UNSOLVABLE. I WILL TRY TO REWRITE THE ENTIRE CODE FROM HERE ON OUT. I NEED TO USE SOME GODLIKE RECURSION WHICH IS BEYOND MY REACH. IF THIS PART DOESNT GET IMPLEMENTED, ARE MY EFFORTS FUTILE?
+	'''print('Row check')
+#	print(cells)
+	thisRowCheckDone=False
 	for rowCheck in enumerate(cells):
 		occurrences={}
 		confirmedNumber=None
@@ -149,15 +118,65 @@ for index in knownIndices:
 			for t in range(len(rowCheck[1])):
 				if len(rowCheck[1][t])!=1:
 					if confirmedNumber in rowCheck[1][t]:
-						knownIndices.append((rowCheck[0], t, confirmedNumber))
 						cells[rowCheck[0]][t]=str(confirmedNumber)
+						# Remove possibility from row, column
+						knownIndices.insert(currentIndice,(rowCheck[0],t, confirmedNumber))
+						thisRowCheckDone=True
 						print('CONFIRMED NUMBER FOUND!!!')
 						success+=1
 						break
+			if thisRowCheckDone: continue'''
+'''	print('Column check, creating columns first')
+	columns=[]
+	for i in range(0, size): # i is the index of the column
+		thisColumn=[]
+		for r in cells: # r is each row
+			thisColumn.append(r[i])
+		columns.append(thisColumn)
+	print(columns)
+	for columnCheck in enumerate(columns): # index, column
+		occurrences={}
+		confirmedNumber=None
+		for elem in columnCheck[1]:
+			if len(elem)!=1:
+				for possibility in elem:
+					#print(possibility, occurrences, elem)
+					if possibility in occurrences:
+						occurrences[possibility]+=1
+					else:
+						occurrences[possibility]=1
+		for k, v in occurrences.items():
+			if v==1:
+				confirmedNumber=k
+				break
+			if confirmedNumber!=None:
+				break
+		if confirmedNumber!=None:
+			print('CONFIRMED COLUMN NUMBER', confirmedNumber)
+			for t in range(len(columnCheck[1])):
+				if len(columnCheck[1][t])!=1:
+					if confirmedNumber in columnCheck[1][t]:
+						print('Confirmed column number found')
+						cells[t][columnCheck[0]]=str(confirmedNumber)
+						knownIndices.insert(currentIndex,(t, columnCheck[0], confirmedNumber))
+						success+=1
+						break'''
+failures = 0
 for elem in sudokuArray:
 	print(' '.join(elem))
+print('—'*10)
+for elem in cells:
+	line = ""
+	for box in elem:
+		if len(box)==1:
+			line+=str(box)
+		else: 
+			line+='#'
+			failures+=1
+	print(' '.join(str(line)))
 for elem in cells:
 	print((elem))
-#print(getChunk(0,0))
-print('Row duplicates removed')
 print(eliminated, 'values eliminated.', success,"values found out.")
+if failures==0: print('Sudoku found out completely!')
+else: print('Unfortunately, Aaryan is an incompetent programmer and cannot code this solver further. Please try to solve the sudoku using the list of possibilities given above, it shouldnt be too difficult.')
+# I will return to this project later. Maybe years later. I am disappointed in myself to not have been able to code this. People say its an easy and cliche code, making this code my biggest L.
