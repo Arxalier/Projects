@@ -1,0 +1,39 @@
+x1,x2,x3=100,850,1100
+# Coulomb's Law on a straight line
+planckTime=1
+q1,q2,q3=90,-10,10
+v1,v2,v3=0,0,0
+a1,a2,a3=0,0,0
+length=50
+upperX=1.5*x3
+lowerX=-(upperX-x3)
+spaceUnit=(upperX-lowerX)/length
+# lower limit is -100, max is 1100
+# 1200 units, 30 spaces
+# 40 units per space
+k=1 # Proportionality constant for coulombs law, equal to 1 for qualitative analysis. In reality it is equal to 9×10⁹/mass of one charge
+steps=1000 # Total time = steps × planckTime
+#position=["O"*1]
+for step in range(steps):
+	map=["-"]*length
+	print('Elapsed time: '+str(step*planckTime)+' relative seconds.')
+	a1=abs(k*q1*q2/((x2-x1))**2)-abs(k*q1*q3/((x3-x1))**2)
+	a2=-abs(k*q2*q1/abs((x2-x1))**2)+abs(k*q2*q3/abs((x2-x3))**2)
+	a3=+abs(k*q3*q1/abs((x3-x1))**2)-abs(k*q3*q2/abs((x2-x3))**2)
+	print('Accelerations:', a1,a2,a3)
+	v1+=a1*planckTime
+	v2+=a2*planckTime
+	v3+=a3*planckTime
+	x1+=v1*planckTime+0.5*a1*planckTime**2
+	x2+=v2*planckTime+0.5*a2*planckTime**2
+	x3+=v3*planckTime+0.5*a3*planckTime**2
+	print('Positions:', x1,x2,x3)
+	print('Display:')
+	try:
+		map[int(x1//spaceUnit)]="q1"
+		map[int(x2//spaceUnit)]="q2"
+		map[int(x3//spaceUnit)]="q3"
+	except IndexError:
+		map=["CONNECTION LOST: Particles have drifted out of map, positions still visible."]
+	print(''.join(map))
+	print('—'*50)
