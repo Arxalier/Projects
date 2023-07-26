@@ -1,0 +1,9 @@
+factorial=float(input())
+def gamma(n, accuracy, upperLimit):
+	function, precision, currentValue, integral=f"(x**({factorial}))*((2.7182)**(-x))", 1/accuracy, 0,0
+	while currentValue<=upperLimit:
+		increment=eval(function.replace("x", str(currentValue)))*precision
+		integral+=increment	
+		currentValue+=precision
+	return integral
+print((gamma(factorial, 1000, 40)))
