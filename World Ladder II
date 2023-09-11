@@ -1,0 +1,69 @@
+initial_word="pranjal"
+final_word = "walterw"
+word_list = ['pranjaw', 'wranjaw', 'wratjaw','prlnjaw', 'waatjaw',"waltjaw","walteaw","walterw", initial_word]
+solution=False
+def transformable(word1, word2):
+	sameLength=(len(word1)==len(word2))
+	equal=(word1==word2)
+	common=0
+	if sameLength:
+		for letter in word1:
+			if letter in word2:
+				common+=1
+	if common==len(word1)-1 and sameLength and not equal:
+		return True
+	else: return False
+#print(transformable("hit","hot"))
+#print(transformable("hht","hhh"))
+# Start from final word amd create branching generations
+generations=[]
+generations.append([[final_word]])
+'''
+generations=[
+G1: [[cat]]
+G2: [[cat, cot],[cat, cut]]
+G3: [cat, cot, ...], [...]
+...]
+Every generation is a list of cases, and every case is a list of words
+'''
+loopComplete=False
+for generation in generations:
+	nextGeneration=[]
+#	print('Generations are',generations)
+#	print('Checking generation', generation)
+	for case in generation:
+#		print('Checking generation case:', case)
+		for word in word_list:
+			if transformable(word, case[-1]) and word not in case:
+				nextGeneration.append(case+[word])
+#				print('New generation found!', case+[word])
+#	print('New generations are', nextGeneration)
+	if nextGeneration!=[]: generations.append(nextGeneration)
+#	time.sleep(5)
+#	print('Checking for fulfillment of criteria:')
+	for generation in generations[-1]:
+#		print('Latest generation:', generation)
+		for cases in generation:
+#			print('Current case:', cases)
+			if cases==initial_word:
+				loopComplete=True
+				solution=True
+	if loopComplete:
+		break
+for i in range(len(generations)):
+	print('Generation',i)
+	for case in generations[i]:
+		print(case)
+	print('—'*30)
+print('-'*40)
+print("Given words:", word_list)
+print("Starting word:", initial_word)
+print("Target:", final_word)
+if not solution:
+	print('It seems that there is no solution to this problem.')
+	quit()
+else:
+	for case in generations[-1]:
+		if case[-1]==initial_word:
+			print('Possible solution:')
+			print(case[::-1])
