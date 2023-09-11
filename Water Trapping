@@ -1,0 +1,46 @@
+elevations=[0,1,0,2,1,0,1,4,2,1,2,1]
+elevations=[0]+elevations+[0]
+maxHeight=max(elevations)
+unit=[" "]*len(elevations)
+count=0
+blockMap=[]
+for i in range(0,maxHeight):
+    blockMap.append(unit[:])
+# Filling
+for columnIndex in range(0, len(elevations)):
+    height=elevations[columnIndex]
+    requiredIndex=maxHeight-height
+    for row in range(0, len(blockMap)):
+        if row>=requiredIndex:
+            blockMap[row][columnIndex]="B"
+# Adding air
+for i in range(0, maxHeight):
+    blockMap[i][0]="O"
+    blockMap[i][-1]="O"
+for i in blockMap:
+    print(i)
+print('\n')
+for row in range(len(blockMap)):
+    for elem in range(len(elevations)):
+        if blockMap[row][elem]==" ":
+            leftCheck=rightCheck=False
+            for i in range(elem,-1,-1):
+                if blockMap[row][i]=="O":
+                    break
+                elif blockMap[row][i]=="B":
+                    leftCheck=True
+                    break
+            if leftCheck:
+                for i in range(elem, len(elevations)+1):
+                    if blockMap[row][i]=="O":
+                        break
+                    elif blockMap[row][i]=="B":
+                        rightCheck=True
+                        break
+            if leftCheck and rightCheck:
+                blockMap[row][elem]="W"
+                count+=1
+print("Final map: ")
+for i in blockMap:
+    print(i[1:-2])
+print("Count:",count)        
