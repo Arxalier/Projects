@@ -1,6 +1,10 @@
 initial_word="pranjal"
 final_word = "walterw"
-word_list = ['pranjaw', 'wranjaw', 'wratjaw','prlnjaw', 'waatjaw',"waltjaw","walteaw","walterw", initial_word]
+word_list = list(set(['pranjaw', 'wranjaw', 'wratjaw','prlnjaw', 'waatjaw',"waltjaw","walteaw","walterw", initial_word]))
+if (final_word not in word_list):
+	print("It seems there are no solutions.")
+	quit()
+attainedWords=[]
 solution=False
 def transformable(word1, word2):
 	sameLength=(len(word1)==len(word2))
@@ -34,8 +38,10 @@ for generation in generations:
 	for case in generation:
 #		print('Checking generation case:', case)
 		for word in word_list:
-			if transformable(word, case[-1]) and word not in case:
+			# If a word is attained already before, there is no point adding it to the next generation because it is impossible for such a case to be the smallest possible solution. hence it is killed off in if statement. This is why successive generations can have less or more thsn previous generations
+			if transformable(word, case[-1]) and word not in attainedWords:
 				nextGeneration.append(case+[word])
+				attainedWords.append(word)
 #				print('New generation found!', case+[word])
 #	print('New generations are', nextGeneration)
 	if nextGeneration!=[]: generations.append(nextGeneration)
