@@ -1,0 +1,38 @@
+import mysql.connector as sqltor
+
+# Phase 1: Initialisation
+con = sqltor.connect(user="", password="", host="localhost")
+# try checking if database is necessary parameter in connect, because when we export the program we will first have to create this database if it doesnt exist on the other pc
+cur = con.cursor()
+cur.execute("CREATE DATABASE IF NOT EXISTS hotel;")
+hotelCon = sqltor.connect(user="", password="", host="localhost", database="hotel")
+hotelCur = hotelCon.cursor()
+
+# Table 1: guestInfo stored by the software. It will receive a succeaaful booking by external means such as a website in practical situations but here we will just take bookings later using input()
+hotelCur.execute('CREATE TABLE IF NOT EXISTS guestInfo (GuestID int() PRIMARY KEY NOT NULL, Name VARCHAR(100), RoomNumber INT(), checkInDate DATE(), checkoutDate DATE(), Contact INT());')
+records = hotelCur.execute('SELECT * FROM guestInfo').fetchall()
+if len(records)==0:
+	hotelCur.execute('INSERT INTO guestInfo VALUES();') # We will put sample data here
+
+# Table 2: orders. The entries of this table will be filled by the staff from in room dining and not directly by the guest
+# Alternatively, we could offer the available food to order in this program itself and the user could select what to buy and automatically place the order here by themselves
+hotelCur.execute('CREATE TABLE IF NOT EXISTS orders (RoomNumber INT() PRIMARY KEY NOT NULL, Order VARCHAR(1000), Price INT(), Information VARCHAR(200));')
+records = hotelCur.execute('SELECT * FROM orders').fetchall()
+if len(records)==0:
+	hotelCur.execute('INSERT INTO guestInfo VALUES();') # We will put sample data here
+
+# Table 3: roomInfo? we can make a table consisting of room number, Room type, maintenance required (a varchar stating None, Room service, Laundry etc.), and a boolean roomOccupied
+
+# Phase 2: Functions
+# We can create general functions for inserting values to each table
+# Imp. add hotelCon.commit() at the end
+
+# Phase 3:
+# We can offer the following choices:
+# 1. Book a room (for the user)
+# 2. Place an order (for the user)
+# 3. Staff login (for this we can use another table storing usernames and passwords) (however we will have to create this table during initialization too whuch means we will have to make the staff passwords public in the code so lets avoid that 💀)
+#     3.1: Access Table guestInfo
+#         3.1.1: The staff will be given a removeUser feature to remove fields from guestInfo only if currentDate>checkoutDate
+#     3.2: Access Table orders
+# 
