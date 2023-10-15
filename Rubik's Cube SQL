@@ -1,40 +1,47 @@
 import mysql.connector as sqltor
+import random
 # THINGS TO DO
 # Change userPassword, username
 
 userPassword = "2444"
 username = "root"
-con = sqltor.connect(user=username, password=userPassword, host="localhost")
-databaseCursor = con.cursor()
-databaseCursor.execute("CREATE DATABASE IF NOT EXISTS rubikscube;")
-faceCon = sqltor.connect(user=username, password=userPassword, host="localhost", database="rubikscube")
-faceCursor = faceCon.cursor()
-faceCursor.execute("SHOW TABLES;")
-rowCount = faceCursor.fetchall()
-if len(rowCount) != 6:
-    faceCursor.execute("CREATE TABLE IF NOT EXISTS face1 (row1 char(1), row2 char(1), row3 char(3));")
-    faceCursor.execute("CREATE TABLE IF NOT EXISTS face2 (row1 char(1), row2 char(1), row3 char(3));")
-    faceCursor.execute("CREATE TABLE IF NOT EXISTS face3 (row1 char(1), row2 char(1), row3 char(3));")
-    faceCursor.execute("CREATE TABLE IF NOT EXISTS face4 (row1 char(1), row2 char(1), row3 char(3));")
-    faceCursor.execute("CREATE TABLE IF NOT EXISTS face5 (row1 char(1), row2 char(1), row3 char(3));")
-    faceCursor.execute("CREATE TABLE IF NOT EXISTS face6 (row1 char(1), row2 char(1), row3 char(3));")
-
 cube = []
-# TOP FRONT RIGHT LEFT BACK DOWN
-w= "\033[1;37mW\033[0m"  # White
-o = "\033[1;35mO\033[0m"   # Orange
-g = "\033[1;32mG\033[0m"   # Green
-b = "\033[1;34mB\033[0m"   # Blue
-r = "\033[1;31mR\033[0m"   # Red
-y = "\033[1;33mY\033[0m"   # Yellow
-text = w + o + g + b + r + y
-#colorsDefault = "WOGBRY"
-colors = ["W","O","G","B","R","Y"]
-# colors = "WOGBRY"
-for color in range(len(colors)):
-    face = []
-    for k in range(3): face.append([colors[color] for i in range(3)])
-    cube.append(face)
+
+def initialise(_username, _password):
+    global faceCursor, faceCon, cube
+    con = sqltor.connect(user=_username, password=_password, host="localhost")
+    databaseCursor = con.cursor()
+    databaseCursor.execute("CREATE DATABASE IF NOT EXISTS rubikscube;")
+    con.commit()
+    faceCon = sqltor.connect(user=_username, password=_password, host="localhost", database="rubikscube")
+    faceCursor = faceCon.cursor()
+    faceCursor.execute("SHOW TABLES;")
+    rowCount = faceCursor.fetchall()
+    if len(rowCount) != 6:
+        faceCursor.execute("CREATE TABLE IF NOT EXISTS face1 (row1 char(1), row2 char(1), row3 char(3));")
+        faceCursor.execute("CREATE TABLE IF NOT EXISTS face2 (row1 char(1), row2 char(1), row3 char(3));")
+        faceCursor.execute("CREATE TABLE IF NOT EXISTS face3 (row1 char(1), row2 char(1), row3 char(3));")
+        faceCursor.execute("CREATE TABLE IF NOT EXISTS face4 (row1 char(1), row2 char(1), row3 char(3));")
+        faceCursor.execute("CREATE TABLE IF NOT EXISTS face5 (row1 char(1), row2 char(1), row3 char(3));")
+        faceCursor.execute("CREATE TABLE IF NOT EXISTS face6 (row1 char(1), row2 char(1), row3 char(3));")
+    cube = []
+    # TOP FRONT RIGHT LEFT BACK DOWN
+    w= "\033[1;37mW\033[0m"  # White
+    o = "\033[1;35mO\033[0m"   # Orange
+    g = "\033[1;32mG\033[0m"   # Green
+    b = "\033[1;34mB\033[0m"   # Blue
+    r = "\033[1;31mR\033[0m"   # Red
+    y = "\033[1;33mY\033[0m"   # Yellow
+    colors = ["W","O","G","B","R","Y"]
+    # colors = [w,o,g,b,r,y]
+    # Uncomment the above line to activate colored mode, but it may not work on all IDEs
+    for color in range(len(colors)):
+        face = []
+        for k in range(3): face.append([colors[color] for i in range(3)])
+        cube.append(face)
+
+initialise(username, userPassword)
+
 def saveCube():
     global faceCursor
     global faceCon
@@ -84,25 +91,12 @@ def loadCube():
     cube[4][0], cube[4][1], cube[4][2] = face5[0], face5[1], face5[2]
     faceCursor.execute("SELECT * FROM face6;")
     face6=faceCursor.fetchall()
-    cube[5][0], cube[5][1], cube[5][2] = face5[0], face5[1], face5[2]
+    cube[5][0], cube[5][1], cube[5][2] = face6[0], face6[1], face6[2]
     faceCon.commit()
-        
-'''
-count=1
-face=[]
-for i in range(6):
-    face=[]
-    for k in range(3):
-        row=[]
-        for j in range(3):
-            row.append(count)
-            count+=1
-        face.append(row)
-    cube.append(face)'''
-# print(cube) # Test for cube rigging
-# for face in cube: print(face)
+
 # CUBE RIG
 def renderCube():
+    global cube
     layout="""
    _______.
   /{}/{}/{} /| 
@@ -115,21 +109,22 @@ def renderCube():
 +—+—+—+/{}/
 |{}|{}|{}|{}/
 +—+—+—+/
-""".format(    cube[0][0][0], cube[0][0][1], cube[0][0][2], cube[0][1][0],cube[0][1][1], cube[0][1][2], cube[0][2][0], cube[0][2][1], cube[0][2][2], cube[2][0][2], cube[2][0][1], cube[1][0][0], cube[1][0][1], cube[1][0][2], cube[2][0][0], cube[2][1][2], cube[2][1][1], cube[1][1][0], cube[1][1][1], cube[1][1][2], cube[2][1][0], cube[2][2][2], cube[2][2][1], cube[1][2][0], cube[1][2][1], cube[1][2][2], cube[2][2][0])
+""".format(cube[0][0][0], cube[0][0][1], cube[0][0][2], cube[0][1][0],cube[0][1][1], cube[0][1][2], cube[0][2][0], cube[0][2][1], cube[0][2][2], cube[2][0][2], cube[2][0][1], cube[1][0][0], cube[1][0][1], cube[1][0][2], cube[2][0][0], cube[2][1][2], cube[2][1][1], cube[1][1][0], cube[1][1][1], cube[1][1][2], cube[2][1][0], cube[2][2][2], cube[2][2][1], cube[1][2][0], cube[1][2][1], cube[1][2][2], cube[2][2][0])
     print(layout)
 
 # Functions for movement use
-def transpose(original_array):
+def rotateClockwise(original_array):
     # Row 1 becomes Column 3 -> 90° Clockwise
     array=original_array[:]
-    transposedArray=[]
+    rotatedArray=[]
     # Take first element of each row 
     for elem in range(0, len(array[0])):
         newRow=[]
         for row in array:
             newRow.append(row[elem])    
-        transposedArray.append(newRow[::-1])
-    return transposedArray
+        rotatedArray.append(newRow[::-1])
+    return rotatedArray
+
 def mirror(original_array):
     mirrored=[]
     for i in original_array:
@@ -139,31 +134,25 @@ def mirror(original_array):
 # Principal Moves
 def y(times=1): # Moves clockwise wrt y axis
     for i in range(times):
-        '''cube[1], cube[3], cube[4], cube[2] = cube[2], cube[1], mirror(cube[3]), mirror(cube[4])
-        cube[0], cube[5] = transpose(cube[0]), transpose(transpose(transpose(cube[5])))'''
         cube[1], cube[2], cube[4], cube[3]=cube[2], cube[4], cube[3], cube[1] 
-        cube[0]=transpose(cube[0])
-        cube[5]=transpose(cube[5])
+        cube[0]=rotateClockwise(cube[0])
+        cube[5]=rotateClockwise(cube[5])
         
 def x(times=1): # Moves clockwise wrt x axis
     for i in range(times):
-        '''cube[1], cube[0], cube[4], cube[5] = cube[5], cube[1], cube[0][::-1], cube[4][::-1]
-        cube[3], cube[2] = transpose(transpose(transpose(cube[3]))), transpose(cube[2])'''
-        cube[2]=transpose(cube[2])
-        cube[3]=transpose(transpose(transpose(cube[3])))
+        cube[2]=rotateClockwise(cube[2])
+        cube[3]=rotateClockwise(rotateClockwise(rotateClockwise(cube[3])))
         cube[0], cube[1], cube[5], cube[4]=cube[1], cube[5][::-1], mirror(cube[4]), mirror(cube[0])[::-1]
         
 def z(times=1): # Moves clockwise wrt z axis
     for i in range(times):  
-        '''cube[0], cube[2], cube[5], cube[3] = transpose(cube[3], False), transpose(cube[0], False), transpose(cube[2], False), transpose(cube[5], False)
-        cube[1], cube[4] = transpose(cube[1]), transpose(cube[4])'''
-        cube[1], cube[4]=transpose(cube[1]), transpose(transpose(transpose(cube[4])))
-        cube[0], cube[3], cube[5], cube[2]=transpose(cube[3]), transpose(transpose(transpose(mirror(cube[5])))), transpose(mirror(cube[2])), transpose(cube[0])
+        cube[1], cube[4]=rotateClockwise(cube[1]), rotateClockwise(rotateClockwise(rotateClockwise(cube[4])))
+        cube[0], cube[3], cube[5], cube[2]=rotateClockwise(cube[3]), rotateClockwise(rotateClockwise(rotateClockwise(mirror(cube[5])))), rotateClockwise(mirror(cube[2])), rotateClockwise(cube[0])
 def u(times=1):
     for i in range(times):
-        '''cube[1][0], cube[3][0], cube[4][0], cube[2][0]= cube[2][0], cube[1][0], cube[3][0][::-1], cube[4][0][::-1]'''
-        cube[0]=transpose(cube[0])
+        cube[0]=rotateClockwise(cube[0])
         cube[1][0], cube[2][0], cube[4][0], cube[3][0]=cube[2][0], cube[4][0], cube[3][0], cube[1][0]
+
 # Using x, y, z and u we can recreate every other move
 def r(times=1):
     for i in range(times):  
@@ -195,37 +184,71 @@ def m(times=1):
         l(3)
         r()
         x(3)
-# Move input
-renderCube()
-movePreset = "R2 L’ D F2 R’ D’ R’ L U’ D R D B2 R’ U D2".split()
-movePreset = "U2 F L2 U2 R2 F L2 F2 L' D' B2 R D2 R' B' U' L' B' x' y' U' R F R' U' D L' U2 L2 U' L' U R' U R R' U R U R' U' R F R U' R' U' R U R' F' R U' R U R U R U' R' U' R2 U".split()
-#movePreset="u2 u2"
-#movePreset="B D F' B' D L2 U L U' B D' R B R D' R L' F U2 D".split()
-#movePreset="U2 R2 F2 U2 D2 F2 L2 U2".split() #hi
-#movePreset= "U2 R2 L2 U2 R2 L2".split()
-#movePreset = "F2 B2 U D’ R2 L2 U D’".split()
-# movePreset = []
+def generateShuffle(intensity):
+    shuffle=''
+    moves=["u","r","l","f","d","b"]
+    for i in range(intensity):
+        change=''
+        move=random.choice(moves)
+        changeRandomizer = random.randint(1,6)
+        if changeRandomizer==1:
+            change='\''
+        elif changeRandomizer==2:
+            change='2'
+        move=move+change
+        shuffle+=move+" "
+    return shuffle[:-1]
+        
+movePreset=[]
+# MAIN
+# Move Input
+print("="*40+'\n',"Rubik's Cube Simulator\nMade by Aaryan Pandey and Pranjal Srivastava, Class XII-G\n","="*40+'\n')
 count=0
 choice = input("Do you want to load your last saved cube? Y/N (Press N if newly opened)")
 if choice.lower() == 'y':
     loadingMode = True
-    print("Loadingmode activated")
+    print("Restoring cube from database...")
 else: loadingMode = False
-print(loadingMode)
+
 while True:
-    '''if count < len(movePreset) and not loadingMode:
+    if choice.lower() == 'n':
+        print("Would you like to start the cube with a preset?")
+        print("""[1] Random Shuffle
+[2] Fully solved
+[3] Checkerboard
+[4] Cube in a cube
+[5] Cube in a cube in a cube
+[6] Staircase
+""")
+        presetChoice = int(input("Enter your choice: "))
+        choice = "" # So that no more choices get asked and program loop can start
+        if presetChoice==1:
+            movePreset=generateShuffle(15).split()
+        if presetChoice==2:
+            movePreset="U2 U2".split()
+        if presetChoice==3:
+            movePreset="U2 D2 F2 B2 L2 R2".split()
+        if presetChoice==4:
+            movePreset="F L F U’ R U F2 L2 U’ L’ B D’ B’ L2 U".split()
+        if presetChoice==5:
+            movePreset="U’ L’ U’ F’ R2 B’ R F U B2 U B’ L U’ F U R F’".split()
+        if presetChoice==6:
+            movePreset="L2 F2 D' L2 B2 D' U' R2 B2 U' L' B2 L D L B' D L' U".split()
+    if count < len(movePreset) and not loadingMode:
         move = movePreset[count].lower().replace(' ', '').replace("’", "'")
         print(move)
-        count+=1'''
-    if loadingMode:
+        count+=1
+    elif loadingMode:
         loadCube()
-        # count=len(movePreset)
+        count=len(movePreset)
         print("Cube loaded from database successfully!")
         renderCube()
         loadingMode=False
         continue
     else:
         print("Enter your move: r, u, l, d, f, b, m. You can also enter moves like r2 or r'.")
+        print("To move the cube around, use x, y and z. You can also enter moves like x2 or x'.")
+        print("Enter Q to quit and H for help")
         move = input().lower().replace(' ', '').replace("’", "'")
     if move[0]=="x": 
         x()
@@ -267,10 +290,11 @@ while True:
         m()
         if move[-1]=="'": m(2)
         elif move[-1]=="2": m()                                     
-    for face in cube:
-        print(face)
-    renderCube()
-    saveCube()
-    print("Cube saved into database successfully!")
-    
-
+    if move not in ["H", "Q"]: renderCube()
+    if move.lower()=="h":
+        print("Please visit https://jperm.net/3x3/moves to understand cube notation")
+    elif move.lower()=="q":
+        quit()
+    if count>=len(movePreset):
+        saveCube()
+        print("Cube saved into database successfully!")
