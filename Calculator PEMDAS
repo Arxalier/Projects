@@ -1,115 +1,140 @@
-def solveExpression(s):
-  stack = ''
-  splitExpression = []
-  for index, char in enumerate(s):
-    if char in '+-/*^':
-      if stack: splitExpression.append(float(stack))
-      stack = ''
-      if char == '/' and s[index + 1] == '/':
-        splitExpression.append('//')
-      elif char == '/' and s[index - 1] == '/':
-        continue
-      if char == '*' and s[index + 1] == '*':
-        splitExpression.append('**')
-      elif char == '*' and s[index - 1] == '*':
-        continue
-      else:
-        splitExpression.append(char)
-      continue
-    stack += char
-  splitExpression.append(float(stack))
-  print("Evaluation components", splitExpression)
-  for index, elem in enumerate(splitExpression):
-    if elem=='-':     
-      j = index + 1
-      while not (isinstance(splitExpression[j], (int, float))):
-        j += 1
-      splitExpression[j]*=-1
-      # prevNum exists? make it +, some other operator exists first? make it X
-      breaker=False
-      for i in range(index-1, -1, -1):
-        if isinstance(splitExpression[i], (int,float)):
-          splitExpression[index]='+'
-          breaker = True
-          break
-        elif splitExpression[i] in ['+','-','/','*','//','^','%','**']:
-          splitExpression[index]='X'
-          break
-      if not breaker: splitExpression[index]="X"
-      print("Corrected evaluation components", splitExpression)
-
-  for index, elem in reversed(list(enumerate(splitExpression))):
-    if elem == '**' or elem == '^':
-      i = index - 1
-      while not (isinstance(splitExpression[i], (int, float))):
-        i -= 1
-      j = index + 1
-      while not (isinstance(splitExpression[j], (int, float))):
-        j += 1
-      splitExpression[index] = (splitExpression[i]**splitExpression[j])
-      splitExpression[i] = 'X'
-      splitExpression[j] = 'X'
-      print("Exponentiation performed, now currently at", splitExpression)
-  for index, elem in enumerate(splitExpression):
-    if elem == '/':
-      i = index - 1
-      while not (isinstance(splitExpression[i], (int, float))):
-        i -= 1
-      j = index + 1
-      while not (isinstance(splitExpression[j], (int, float))):
-        j += 1
-      splitExpression[index] = (splitExpression[i] / splitExpression[j])
-      splitExpression[i] = 'X'
-      splitExpression[j] = 'X'
-      print("Division performed, now currently at", splitExpression)
-
-  for index, elem in enumerate(splitExpression):
-    if elem == '*':
-      i = index - 1
-      while not (isinstance(splitExpression[i], (int, float))):
-        i -= 1
-      j = index + 1
-      while not (isinstance(splitExpression[j], (int, float))):
-        j += 1
-      splitExpression[index] = (splitExpression[i] * splitExpression[j])
-      splitExpression[i] = 'X'
-      splitExpression[j] = 'X'
-      print("Multiplication performed, now currently at", splitExpression)
-  for index, elem in enumerate(splitExpression):
-    if elem == '+' or elem == '-':
-      i = index - 1
-      while not (isinstance(splitExpression[i], (int, float))):
-        i -= 1
-      j = index + 1
-      while not (isinstance(splitExpression[j], (int, float))):
-        j += 1
-      if elem == '+':
-        if i<0:splitExpression[index] = (splitExpression[j])
-
-        else: splitExpression[index] = (splitExpression[i] + splitExpression[j])
-      else:
-        splitExpression[index] = (splitExpression[i] - splitExpression[j])
-      splitExpression[i] = 'X'
-      splitExpression[j] = 'X'
-      print("Addition/Subtraction performed, now currently at", splitExpression)
-  print(splitExpression)
-  for elem in splitExpression:
-    if elem != 'X': return elem
-
-#actualQuestion = '7 ^ 2 + (8 * 4 / 2 - (6 + 3 ^ 3) + 5 * (7 - 2 ^ 2)) / (3 * (9 - 5 * (2 + 3 ^ 2) / 4) + 6) - 18 / 2 + 4 * 5'
-actualQuestion = '(12345 * 67890 + 98765) / (45678 - 34567)'
-actualQuestion = input()
-question = "(" + actualQuestion.replace(" ", '') + ")"
-while ')' in question:
-  print(question)
-  firstClosing = question.index(')')
-  opening = firstClosing - 1
-  while question[opening] != '(':
-    opening -= 1
-  print("CURRENTLY EVALUATING:", question[opening:firstClosing + 1])
-  answer = solveExpression(question[opening + 1:firstClosing])
-  question = question[:opening] + str(answer) + question[firstClosing + 1:]
-print(question)
-
 # When I wrote this code, only god and I knew how it worked.
 # Now, only god knows how this code works.
+
+"""
+// 
+// Dear maintainer:
+// 
+// Once you are done trying to 'optimize' this routine,
+// and have realized what a terrible mistake that was,
+// please increment the following counter as a warning
+// to the next guy:
+// 
+// total_hours_wasted_here = 42
+// """
+
+# Note: Known errors so far: If you wish to evaluate 7-2^2, please write it as 7-(2^2), otherwise your answer will end up as 11
+# Fix exponentiation error above
+def solveExpression(s):
+    stack = ""
+    splitExpression = []
+    s = s.replace("//", "F").replace("**", "^")
+    encountered = [0, 0, 0]
+    for char in s:
+        if char in "+-/*^F%":
+            if char == "^":
+                encountered[0] += 1
+            elif char in "/*%F":
+                encountered[1] += 1
+            else:
+                encountered[2] += 1
+            if stack:
+                splitExpression.append(float(stack))
+            stack = ""
+            splitExpression.append(char)
+            continue
+        stack += char
+    splitExpression.append(float(stack))
+    for index, elem in enumerate(splitExpression):
+        if elem == "-":
+            j = index + 1
+            while not (isinstance(splitExpression[j], (int, float))):
+                j += 1
+            splitExpression[j] *= -1
+            # prevNum exists? make it +, some other operator exists first? make it X
+            breaker = False
+            for i in range(index - 1, -1, -1):
+                if isinstance(splitExpression[i], (int, float)):
+                    splitExpression[index] = "+"
+                    breaker = True
+                    break
+                elif splitExpression[i] in ["+", "-", "/", "*", "//", "^", "%", "**"]:
+                    splitExpression[index] = "X"
+                    break
+            if not breaker:
+                splitExpression[index] = "X"
+    print("="*40)
+    print("Evaluation components", [i for i in splitExpression if i != "X"])
+    for index, elem in reversed(list(enumerate(splitExpression))):
+        if encountered[0] == 0:
+            break
+        if elem == "^":
+            i = index - 1
+            while not (isinstance(splitExpression[i], (int, float))):
+                i -= 1
+            j = index + 1
+            while not (isinstance(splitExpression[j], (int, float))):
+                j += 1
+            splitExpression[index] = splitExpression[i] ** splitExpression[j]
+            splitExpression[i] = "X"
+            splitExpression[j] = "X"
+            print("Evaluation components", [i for i in splitExpression if i != "X"])
+    for index, elem in enumerate(splitExpression):
+        if encountered[1] == 0:
+            break
+        if elem in ["/", "F", "%", "*"]:
+            i = index - 1
+            while not (isinstance(splitExpression[i], (int, float))):
+                i -= 1
+            j = index + 1
+            while not (isinstance(splitExpression[j], (int, float))):
+                j += 1
+            if elem == "/":
+                splitExpression[index] = splitExpression[i] / splitExpression[j]
+            elif elem == "F":
+                splitExpression[index] = splitExpression[i] // splitExpression[j]
+            elif elem == "*":
+                splitExpression[index] = splitExpression[i] * splitExpression[j]
+            else:
+                splitExpression[index] = splitExpression[i] % splitExpression[j]
+            splitExpression[i] = "X"
+            splitExpression[j] = "X"
+            print("Evaluation components", [i for i in splitExpression if i != "X"])
+    for index, elem in enumerate(splitExpression):
+        if encountered[2] == 0:
+            break
+        if elem == "+" or elem == "-":
+            i = index - 1
+            while not (isinstance(splitExpression[i], (int, float))):
+                i -= 1
+            j = index + 1
+            while not (isinstance(splitExpression[j], (int, float))):
+                j += 1
+            if elem == "+":
+                if i < 0:
+                    splitExpression[index] = splitExpression[j]
+
+                else:
+                    splitExpression[index] = splitExpression[i] + splitExpression[j]
+            else:
+                splitExpression[index] = splitExpression[i] - splitExpression[j]
+            splitExpression[i] = "X"
+            splitExpression[j] = "X"
+            print("Evaluation components", [i for i in splitExpression if i != "X"])
+    print("Evaluation components", [i for i in splitExpression if i != "X"])
+    for elem in splitExpression:
+        if elem != "X":
+            return elem
+
+
+lines = []
+actualQuestion = "7 ^ 2 + (8 * 4 / 2 - (6 + 3 ^ 3) + 5 * (7 - (2 ^ 2))) / (3 * (9 - 5 * (2 + 3 ^ 2) / 4) + 6) - 18 / 2 + 4 * 5"
+# actualQuestion = '7 ^ 2 + (8 * 4 / 2 - (6 + 3 ^ 3) + 5 * (7 - (2 ^ 2))) / (3 * (9 - 5 * (2 + 3 ^ 2) / 4) + 6) - 18 / 2 + 4 * 5'
+# actualQuestion = "6+(-2^2)"
+question = "(" + actualQuestion.replace(" ", "") + ")"
+while ")" in question:
+    lines.append(question)
+    firstClosing = question.index(")")
+    opening = firstClosing - 1
+    while question[opening] != "(":
+        opening -= 1
+    print("CURRENTLY EVALUATING:", question[opening : firstClosing + 1])
+    answer = solveExpression(question[opening + 1 : firstClosing])
+    question = question[:opening] + str(answer) + question[firstClosing + 1 :]
+print("="*40)
+print("Your answer is", question)
+print("It was calculated as:")
+for line in lines:
+    print(line)
+print(question)
+
