@@ -1,5 +1,8 @@
 # Logic Gate Solver
-import itertools
+# Example inputs:
+# A and (not B or C)
+# A xor B xor C
+# you may use as many letters as required, but the time complexity will also be O(2^N)
 def and_gate(a: int, b: int): return a*b
 def or_gate(a:int, b: int): return int(bool(a+b))
 def not_gate(a:int): return abs(a-1)
@@ -22,8 +25,16 @@ for term in terms:
 for t in splitTerms[:]:
 	if str(t) in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" and len(t)==1 and t not in pins:
 		pins.append(t)
-possibilities = [[0,1]]*len(pins)
-combinations = list(itertools.product(*possibilities))
+
+combinations = []
+def generateUtil(cur, maxLength): # recursive function to populate combinations with all possible bit values for each pin
+    if len(cur)==maxLength:
+        combinations.append(cur)
+        return None
+    else:
+        generateUtil(cur+'0', maxLength)
+        generateUtil(cur+'1', maxLength)     
+generateUtil('', len(pins)) 
 counter = 0
 def solveExpression(expression: list):
 	global counter
@@ -32,34 +43,34 @@ def solveExpression(expression: list):
 	while "not" in expression:
 		for term in range(len(expression)-1,-1,-1):
 			if expression[term]=="not":
-				expression[term:term+2]=[not_gate(expression[term+1])]
+				expression[term:term+2]=[not_gate(int(expression[term+1]))]
 				print(expression)
 				break
 	while "and" in expression:
 		for term in range(len(expression)-1,-1,-1):
 			if expression[term]=="and":
-				expression[term-1:term+2]=[and_gate(expression[term-1], expression[term+1])]
+				expression[term-1:term+2]=[and_gate(int(expression[term-1]), int(expression[term+1]))]
 				print(expression)
 	while "or" in expression:
 		for term in range(len(expression)-1,-1,-1):
 			if expression[term]=="or":
-				expression[term-1:term+2]=[or_gate(expression[term-1], expression[term+1])]
+				expression[term-1:term+2]=[or_gate(int(expression[term-1]), int(expression[term+1]))]
 	while "xor" in expression:
 		for term in range(len(expression)-1,-1,-1):
 			if expression[term]=="xor":
-				expression[term-1:term+2]=[xor_gate(expression[term-1], expression[term+1])]
+				expression[term-1:term+2]=[xor_gate(int(expression[term-1]), int(expression[term+1]))]
 	while "implies" in expression:
 		for term in range(len(expression)-1,-1,-1):
 			if expression[term]=="implies":
-				expression[term-1:term+2]=[implies(expression[term-1], expression[term+1])]
+				expression[term-1:term+2]=[implies(int(expression[term-1]), int(expression[term+1]))]
 				print("Evaluated to: "+str(expression))					
 	return expression
-rawSplitTerms=splitTerms[:]
-truthTable = [pins+[q]]
+rawSplitTerms=splitTerms[:] # this is just a copy of the list by each object
+truthTable = [pins+[q]] # q is just the question, so we get ['A', 'B', 'A or B'] for example
 for combination in combinations:
 	print('Current combination is '+str(combination))
 	print('Current split terms are',splitTerms)
-	splitTerms[:]=rawSplitTerms[:]
+	splitTerms[:]=rawSplitTerms[:] # now we are copying these raw split terms because we'll be changing them over and over
 	for pin in range(len(combination)):
 		currentPin=pins[pin]
 		correspondingValue=combination[pin]
