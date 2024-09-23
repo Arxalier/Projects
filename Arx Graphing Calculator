@@ -1,4 +1,7 @@
 # Graphing calculator, (30,20)
+# NOTE: write equation in the form f(x,y)=0
+#for example: x+3y-5=0
+#for example: y-x^2=0
 # INITIALISATION
 plane = []
 x_length=50 # Keep even number
@@ -46,7 +49,7 @@ print('Arx Graphing Calculator')
 print("Supports all equations in x and y (no support for trigonometric functions)")
 while True:
 	equation = input("Enter equation in standard form: ").replace(' ','')[:-2]
-	equation=equation.replace("^","**").replace("e","(2.7182)").replace("π","3.1415")
+	equation=equation.replace("^","**").replace("e","(2.7182)").replace("π","(3.1415)")
 	#plot_graph()
 	function=[]
 	print(equation)
@@ -64,7 +67,7 @@ while True:
 			#print(row, elem, counter, function[counter])
 			if function[counter][2]==0:
 				plane[row][elem]="X"
-			elif abs(function[counter][2])<=1:
+			elif abs(function[counter][2])<=1: # closeness to actual graph, if the coordinate placed in the function is within +- 1 of 0, the point is close enough to the function to be highlighted slightly
 				if plane[row][elem] != "X": plane[row][elem]="*"
 			elif abs(function[counter][2])<=2:
 				if plane[row][elem] != "X": plane[row][elem]="."
@@ -73,6 +76,8 @@ while True:
 			counter+=1
 	#plot_graph()
 	display_graph()
+
+	# The code ends here only, I added the following part for fun
 	integrateChoice=int(input('Enter 1 if you want to perform definite integration: '))
 	if integrateChoice==1:
 		fixedExpression=input("Please repeat the given expression in y=f(x) form: y=").replace("^","**").replace("e","(2.7182)").replace("π","3.1415")
@@ -82,7 +87,7 @@ while True:
 		startLimit=float(input("Enter starting limit: "))
 		endLimit=float(input("Enter ending limit: "))
 		currentValue=startLimit
-		while currentValue<=endLimit:
+		while currentValue<=endLimit: 
 			currentExpression=fixedExpression.replace("x","("+str(currentValue)+")")
 			integral+=(eval(currentExpression)*precision)
 			currentValue+=precision
